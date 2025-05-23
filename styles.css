@@ -459,6 +459,51 @@ nav {
     background-color: #c0392b;
 }
 
+/* 数据同步功能样式 */
+.data-sync-section {
+    border-top: 1px solid #e0e0e0;
+    padding-top: 20px;
+    margin-top: 30px;
+}
+
+.data-sync-section h3 {
+    color: #3498db;
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+}
+
+.sync-btn {
+    padding: 10px 20px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: all 0.3s;
+    margin-right: 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sync-btn:hover {
+    background-color: #2980b9;
+}
+
+.sync-btn i {
+    font-size: 0.9rem;
+}
+
+.sync-hint {
+    color: #7f8c8d;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    margin-top: 10px;
+    display: block;
+    width: 100%;
+}
+
 /* 页脚样式 */
 footer {
     text-align: center;

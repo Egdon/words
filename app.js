@@ -90,6 +90,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const autoAudioCheck = document.getElementById('auto-audio');
     const resetProgressBtn = document.getElementById('reset-progress-btn');
     
+    // 数据同步功能元素
+    const exportDataBtn = document.getElementById('export-data-btn');
+    const importDataBtn = document.getElementById('import-data-btn');
+    const importFile = document.getElementById('import-file');
+    
     // 初始化
     loadSettings();
     // 直接显示当前单词和更新进度
@@ -333,6 +338,24 @@ document.addEventListener('DOMContentLoaded', function() {
     resetProgressBtn.addEventListener('click', function() {
         if (confirm('确定要重置所有学习进度吗？这将无法恢复！')) {
             resetProgress();
+        }
+    });
+    
+    // 数据同步功能事件监听器
+    exportDataBtn.addEventListener('click', function() {
+        exportLearningData();
+    });
+    
+    // 导入数据按钮点击
+    importDataBtn.addEventListener('click', function() {
+        importFile.click();
+    });
+    
+    // 文件选择后导入数据
+    importFile.addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            importLearningData(file);
         }
     });
     
@@ -1168,4 +1191,128 @@ function hideInstallPrompt() {
             installBanner.remove();
         }, 300);
     }
+}
+
+// 数据导入导出功能
+function exportLearningData() {
+    try {
+        // 收集所有需要同步的数据
+        const exportData = {
+            version: '1.0',
+            timestamp: new Date().toISOString(),
+            vocabularyData: vocabularyData,
+            userSettings: userSettings,
+            currentWordIndex: currentWordIndex,
+            currentWrongIndex: currentWrongIndex,
+            lastReviewCheck: localStorage.getItem('lastReviewCheck')
+        };
+        
+        // 创建JSON字符串
+        const dataStr = JSON.stringify(exportData, null, 2);
+        
+        // 创建Blob对象
+        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+        
+        // 创建下载链接
+        const url = URL.createObjectURL(dataBlob);
+        const link = document.createElement('a');
+        link.href = url;
+        
+        // 生成文件名（包含日期时间）
+        const now = new Date();
+        const dateStr = now.getFullYear() + '-' + 
+                       String(now.getMonth() + 1).padStart(2, '0') + '-' + 
+                       String(now.getDate()).padStart(2, '0') + '_' +
+                       String(now.getHours()).padStart(2, '0') + '-' +
+                       String(now.getMinutes()).padStart(2, '0');
+        
+        link.download = `vocabulary_data_${dateStr}.json`;
+        
+        // 触发下载
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        // 清理URL对象
+        URL.revokeObjectURL(url);
+        
+        alert(`✅ 学习数据已导出！\n文件名: vocabulary_data_${dateStr}.json\n\n请妥善保存此文件，以便在其他设备上导入。`);
+        
+    } catch (error) {
+        console.error('导出数据失败:', error);
+        alert('❌ 导出数据失败，请重试。');
+    }
+}
+
+function importLearningData(file) {
+    const reader = new FileReader();
+    
+    reader.onload = function(e) {
+        try {
+            const importData = JSON.parse(e.target.result);
+            
+            // 验证数据格式
+            if (!importData.version || !importData.vocabularyData) {
+                throw new Error('无效的数据文件格式');
+            }
+            
+            // 确认导入操作
+            const confirmMsg = `📂 检测到学习数据文件\n\n` +
+                             `导出时间: ${new Date(importData.timestamp).toLocaleString()}\n` +
+                             `数据版本: ${importData.version}\n` +
+                             `词汇数量: ${importData.vocabularyData.length}\n\n` +
+                             `⚠️ 导入将覆盖当前所有学习进度！\n\n确定要导入吗？`;
+            
+            if (!confirm(confirmMsg)) {
+                return;
+            }
+            
+            // 导入词汇数据
+            vocabularyData = importData.vocabularyData;
+            saveVocabularyData();
+            
+            // 导入用户设置
+            if (importData.userSettings) {
+                userSettings = importData.userSettings;
+                saveSettings();
+                
+                // 更新设置界面
+                document.getElementById('daily-goal').value = userSettings.dailyGoal;
+                document.getElementById('review-frequency').value = userSettings.reviewFrequency;
+                document.getElementById('test-mode').value = userSettings.testMode;
+                document.getElementById('auto-audio').checked = userSettings.autoAudio;
+            }
+            
+            // 导入当前索引
+            if (typeof importData.currentWordIndex === 'number') {
+                currentWordIndex = Math.min(importData.currentWordIndex, vocabularyData.length - 1);
+            }
+            
+            if (typeof importData.currentWrongIndex === 'number') {
+                currentWrongIndex = importData.currentWrongIndex;
+            }
+            
+            // 导入复习检查日期
+            if (importData.lastReviewCheck) {
+                localStorage.setItem('lastReviewCheck', importData.lastReviewCheck);
+            }
+            
+            // 更新界面
+            displayCurrentWord();
+            updateProgressStats();
+            updateWrongWords();
+            
+            alert(`✅ 数据导入成功！\n\n已恢复学习进度和设置。\n导入时间: ${new Date(importData.timestamp).toLocaleString()}`);
+            
+        } catch (error) {
+            console.error('导入数据失败:', error);
+            alert(`❌ 导入数据失败！\n\n错误信息: ${error.message}\n\n请确保选择的是正确的词汇数据文件。`);
+        }
+    };
+    
+    reader.onerror = function() {
+        alert('❌ 文件读取失败，请重试。');
+    };
+    
+    reader.readAsText(file);
 }

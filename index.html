@@ -205,6 +205,26 @@
                     <label for="auto-audio">自动播放发音:</label>
                     <input type="checkbox" id="auto-audio">
                 </div>
+                
+                <!-- 数据同步功能 -->
+                <div class="data-sync-section">
+                    <h3>数据同步</h3>
+                    <div class="setting-item">
+                        <button id="export-data-btn" class="sync-btn">
+                            <i class="fas fa-download"></i> 导出学习数据
+                        </button>
+                        <button id="import-data-btn" class="sync-btn">
+                            <i class="fas fa-upload"></i> 导入学习数据
+                        </button>
+                    </div>
+                    <div class="setting-item">
+                        <input type="file" id="import-file" accept=".json" style="display: none;">
+                        <small class="sync-hint">
+                            💡 提示：可以在不同设备间导入导出学习数据来同步学习进度
+                        </small>
+                    </div>
+                </div>
+                
                 <div class="setting-item">
                     <button id="reset-progress-btn" class="danger-btn">重置学习进度</button>
                 </div>
