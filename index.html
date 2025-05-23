@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学术词汇记忆助手</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="description" content="帮助记忆和学习英语学术词汇的应用">
+    <meta name="theme-color" content="#3498db">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="词汇助手">
+    <meta name="msapplication-TileColor" content="#3498db">
+    <meta name="application-name" content="学术词汇记忆助手">
+    
+    <!-- Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Icons -->
+    <link rel="icon" type="image/svg+xml" href="icons/icon-192x192.svg">
+    <link rel="apple-touch-icon" href="icons/icon-192x192.svg">
+    
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>学术词汇记忆助手</h1>
+            <nav>
+                <button id="home-btn" class="nav-btn active">学习</button>
+                <button id="test-btn" class="nav-btn">测试</button>
+                <button id="wrong-btn" class="nav-btn">错题本</button>
+                <button id="wrong-study-btn" class="nav-btn">学习错题</button>
+                <button id="progress-btn" class="nav-btn">进度</button>
+                <button id="settings-btn" class="nav-btn">设置</button>
+            </nav>
+        </header>
+
+        <!-- 主页面 - 学习卡片 -->
+        <section id="home-section" class="section active">
+            <div class="card-container">
+                <div class="flashcard" id="flashcard">
+                    <div class="card-front">
+                        <h2 id="word-text">Loading...</h2>
+                        <button id="play-audio" class="audio-btn"><i class="fas fa-volume-up"></i></button>
+                    </div>
+                    <div class="card-back">
+                        <h3>释义:</h3>
+                        <p id="definition-text"></p>
+                    </div>
+                </div>
+                <div class="controls">
+                    <button id="prev-btn" class="control-btn"><i class="fas fa-arrow-left"></i> 上一个</button>
+                    <button id="random-btn" class="control-btn"><i class="fas fa-random"></i> 随机</button>
+                    <button id="next-btn" class="control-btn">下一个 <i class="fas fa-arrow-right"></i></button>
+                </div>
+                <div class="difficulty-buttons">
+                    <button id="hard-btn" class="difficulty-btn">困难</button>
+                    <button id="medium-btn" class="difficulty-btn">一般</button>
+                    <button id="easy-btn" class="difficulty-btn">简单</button>
+                    <button id="unknown-btn" class="difficulty-btn unknown-btn">认不识</button>
+                </div>
+            </div>
+        </section>
+        
+        <!-- 错题学习页面 -->
+        <section id="wrong-study-section" class="section">
+            <div class="card-container">
+                <div class="wrong-study-header">
+                    <h2>错题学习模式</h2>
+                </div>
+                <div class="flashcard" id="wrong-flashcard">
+                    <div class="card-front wrong-card">
+                        <h2 id="wrong-word-text">Loading...</h2>
+                        <button id="wrong-play-audio" class="audio-btn"><i class="fas fa-volume-up"></i></button>
+                    </div>
+                    <div class="card-back wrong-card">
+                        <h3>释义:</h3>
+                        <p id="wrong-definition-text"></p>
+                    </div>
+                </div>
+                <div class="controls">
+                    <button id="wrong-prev-btn" class="control-btn"><i class="fas fa-arrow-left"></i> 上一个</button>
+                    <button id="wrong-random-btn" class="control-btn"><i class="fas fa-random"></i> 随机</button>
+                    <button id="wrong-next-btn" class="control-btn">下一个 <i class="fas fa-arrow-right"></i></button>
+                </div>
+                <div class="difficulty-buttons">
+                    <button id="wrong-hard-btn" class="difficulty-btn">困难</button>
+                    <button id="wrong-medium-btn" class="difficulty-btn">一般</button>
+                    <button id="wrong-easy-btn" class="difficulty-btn">简单</button>
+                    <button id="wrong-remove-btn" class="difficulty-btn remove-btn">移出错题</button>
+                </div>
+                <div class="keyboard-hints">
+                    键盘控制: <span class="keyboard-hint">←</span> 上一个 | <span class="keyboard-hint">→</span> 下一个 | <span class="keyboard-hint">空格</span> 翻转卡片 | <span class="keyboard-hint">1</span> 简单 | <span class="keyboard-hint">2</span> 一般 | <span class="keyboard-hint">3</span> 困难 | <span class="keyboard-hint">R</span> 随机 | <span class="keyboard-hint">D</span> 移出错题
+                </div>
+            </div>
+        </section>
+
+        <!-- 测试页面 -->
+        <section id="test-section" class="section">
+            <div class="test-container">
+                <div class="question-container">
+                    <h2 id="question-text">选择正确的翻译:</h2>
+                    <h3 id="test-word"></h3>
+                </div>
+                <div class="options-container" id="options-container">
+                    <!-- 选项将通过JavaScript动态生成 -->
+                </div>
+                <div class="result-container" id="result-container">
+                    <p id="result-text"></p>
+                    <button id="next-question-btn" class="control-btn">下一题</button>
+                </div>
+            </div>
+        </section>
+        
+        <!-- 错题本页面 -->
+        <section id="wrong-section" class="section">
+            <div class="wrong-container">
+                <h2>错题本</h2>
+                <div class="wrong-list-container">
+                    <div id="wrong-words-count" class="wrong-count">错题数: 0</div>
+                    <div id="wrong-list" class="word-list">
+                        <!-- 错题列表将通过JavaScript动态生成 -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 进度页面 -->
+        <section id="progress-section" class="section">
+            <div class="progress-container">
+                <div class="progress-stats">
+                    <div class="stat-box">
+                        <h3>总词汇量</h3>
+                        <p id="total-words">570</p>
+                    </div>
+                    <div class="stat-box">
+                        <h3>已学习</h3>
+                        <p id="learned-words">0</p>
+                    </div>
+                    <div class="stat-box">
+                        <h3>掌握</h3>
+                        <p id="mastered-words">0</p>
+                    </div>
+                    <div class="stat-box">
+                        <h3>需复习</h3>
+                        <p id="review-words">0</p>
+                    </div>
+                </div>
+                <div class="progress-chart">
+                    <h3>学习进度</h3>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" id="progress-bar"></div>
+                    </div>
+                    <p><span id="progress-percentage">0</span>% 完成</p>
+                </div>
+                <div class="word-list-container">
+                    <h3>词汇状态</h3>
+                    <div class="word-list-tabs">
+                        <button id="all-words-tab" class="word-tab active">全部</button>
+                        <button id="mastered-words-tab" class="word-tab">已掌握</button>
+                        <button id="learning-words-tab" class="word-tab">学习中</button>
+                        <button id="review-words-tab" class="word-tab">需复习</button>
+                    </div>
+                    <div class="word-list" id="word-list">
+                        <!-- 词汇列表将通过JavaScript动态生成 -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 设置页面 -->
+        <section id="settings-section" class="section">
+            <div class="settings-container">
+                <h2>学习设置</h2>
+                <div class="setting-item">
+                    <label for="daily-goal">每日学习目标:</label>
+                    <select id="daily-goal">
+                        <option value="10">10个单词</option>
+                        <option value="20" selected>20个单词</option>
+                        <option value="30">30个单词</option>
+                        <option value="50">50个单词</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <label for="review-frequency">复习频率:</label>
+                    <select id="review-frequency">
+                        <option value="1">非常频繁</option>
+                        <option value="2" selected>频繁</option>
+                        <option value="3">适中</option>
+                        <option value="4">较少</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <label for="test-mode">测试模式:</label>
+                    <select id="test-mode">
+                        <option value="en-to-zh" selected>英文 → 中文</option>
+                        <option value="zh-to-en">中文 → 英文</option>
+                        <option value="mixed">混合模式</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <label for="auto-audio">自动播放发音:</label>
+                    <input type="checkbox" id="auto-audio">
+                </div>
+                <div class="setting-item">
+                    <button id="reset-progress-btn" class="danger-btn">重置学习进度</button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <p>学术词汇记忆助手 &copy; 2025</p>
+    </footer>
+
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js')
+                    .then(registration => {
+                        console.log('[SW] 注册成功:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('[SW] 注册失败:', error);
+                    });
+            });
+        }
+    </script>
+
+    <script src="vocabulary.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
